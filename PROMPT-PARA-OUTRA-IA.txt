@@ -1,0 +1,69 @@
+
+Objetivo: Gerar/ajustar um projeto completo de site + CMS para uma igreja, com os requisitos abaixo. Responda sempre em PT-BR, mantendo ortografia correta.
+
+# Resumo do Projeto
+- Frontend: React (Vite) + Tailwind + React Router + React Quill.
+- Backend: Node/Express com JWT, armazenamento em JSON e upload de arquivos.
+- Tema claro/escuro, logo em destaque.
+- Boletim em PDF embutido e imprimível exatamente como o original (iframe + print).
+- Admin protegido com login/senha.
+- Áreas dinâmicas (criar, renomear, ordenar e remover).
+- Blocos de conteúdo dentro de cada área, com editor rico (Quill): negrito, itálico, listas, links, imagens (upload) e vídeos do YouTube (embed).
+- Histórico de versões por bloco e restauração.
+- Preview ao vivo do bloco e **pré-visualização da página inteira** sem salvar.
+
+# Estrutura de Dados
+content.json:
+```
+{ "areas": [ { "id": String, "nome": String, "ordem": Number, "blocos": [ { "id": String, "titulo": String, "conteudo": HTML } ] } ] }
+```
+history.json:
+```
+{ [blockId: string]: [{ id: string, timestamp: number, snapshot: { titulo: string, conteudo: HTML } }] }
+```
+
+# Endpoints (API)
+- POST `/auth/login` → { email, password } → { token }
+- GET `/content` → retorna `{ areas }`
+- POST `/areas` (auth) → { nome }
+- PUT `/areas/:id` (auth) → { nome?, ordem? }
+- DELETE `/areas/:id` (auth)
+- POST `/blocks` (auth) → { areaId, titulo, conteudo }
+- PUT `/blocks/:id` (auth) → { titulo?, conteudo? } (salva histórico)
+- DELETE `/blocks/:id` (auth)
+- GET `/history/:blockId` (auth) → { versions: [...] }
+- POST `/restore/:blockId` (auth) → { versionId }
+- POST `/upload/image` (auth) → form-data `image` → { url }
+- POST `/upload/pdf` (auth) → form-data `boletim` → { ok, file }
+
+# Regras de UI/UX
+- Design limpo, moderno, com cards arredondados e sombras sutis.
+- Tipografia com `@tailwindcss/typography` para renderizar HTML do Quill.
+- Tema escuro com `darkMode: "class"` no Tailwind.
+- Header fixo com logo destacada e link para **Área Administrativa**.
+- Home: seção com PDF (botões Baixar/Imprimir) + renderização das áreas/blocos.
+- Admin: listagem de áreas e blocos, botões para criar e editar.
+- **Modal de edição** com layout de 2 colunas: Editor Quill (esquerda) e **preview ao vivo** (direita).
+- **Pré-visualização da página inteira**: modal full-screen renderizando o componente Home com dados em *draft* do estado local (sem salvar).
+
+# Requisitos Funcionais
+1. Login com JWT (e-mail/senha vindos do `.env`).
+2. Upload de imagens a partir do botão de imagem do Quill (salva em `/public/uploads` e retorna URL).
+3. Upload de novo PDF do boletim (substitui o arquivo servido em `/boletim-setembro-2025.pdf`).
+4. Histórico automático a cada `PUT /blocks/:id`, com possibilidade de restauração.
+5. Impressão do PDF diretamente do iframe, mantendo formatação original.
+
+# Build & Deploy
+- Backend: Node 18+, `npm start`. Persistir `/server/data`.
+- Frontend: Vite, `VITE_API_URL` deve apontar para a API pública. `npm run build` e publicar `dist/`.
+
+# Entregáveis Esperados
+- Projeto com duas pastas: `server/` (API) e `frontend/` (SPA).
+- Código limpo, comentado quando necessário.
+- README com passos para rodar local e publicar.
+- Opcional: scripts de Docker (não obrigatório).
+
+# Observações
+- Manter ortografia correta em textos apresentados ao usuário final.
+- Se possível, otimizar UX com feedbacks (“Salvo”, “Erro ao salvar”).
+- Evitar dependências desnecessárias; manter o setup simples.

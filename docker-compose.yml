@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  server:
+    build: ./server
+    container_name: igreja-server
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server/data:/app/data
+      - ./server/uploads:/app/public/uploads
+    env_file:
+      - ./server/.env
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: igreja-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    restart: always
